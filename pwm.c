@@ -27,7 +27,7 @@ void HalfBridgePWM(void){
     //PWM Generator controls the PWM1H and PWM1L output pins
     //PWM1H & PWM1L output pins are active high
     PG1EVTLbits.UPDTRG = 1; // A write of the PGxDC register automatically sets the UPDATE bit
-    PG1EVTLbits.ADTR1PS = 6; //0; //1:1 postscaler Trigger 1
+    PG1EVTLbits.ADTR1PS = 0; //0; //1:1 postscaler Trigger 1
     PG1EVTLbits.ADTR1EN1 = 1; //PGxTRIGA for triggering trigger 1
     //Write to DATA REGISTERS
     PG1PER = 0x435a;//0x21a0;// //PWM frequency is 100kHz

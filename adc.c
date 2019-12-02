@@ -177,12 +177,7 @@ void __attribute__((interrupt, no_auto_psv)) _ADCAN0Interrupt(void)
    
     
     #ifndef FEEDBACK
- //running[4] = running[3];
-    //running[3] = running[2];
-    //running[2] = running[1];
-    running[1] = running[0];
-    running[0] = dataADC0;
-    dataADC0 = (running[0]+running[1])/2;
+ 
     #ifndef PWMMODE
     PG1DC = dataADC0; //1;
     if(dataADC0&0x800){
@@ -193,10 +188,11 @@ void __attribute__((interrupt, no_auto_psv)) _ADCAN0Interrupt(void)
         PG4DC = (dataADC0^0x7ff); //2;
     }
     #else
+    //dataADC0=(((dataADC0-2048)*2)+2048);
     PG1DC = dataADC0<<2;
     PG4DC = dataADC0<<2;
     PG3DC = ((dataADC0^0xfff)-0)<<2;
-    //if(LATEbits.LATE6==1){LATEbits.LATE6=0;}else{LATEbits.LATE6=1;}
+    if(LATEbits.LATE6==1){LATEbits.LATE6=0;}else{LATEbits.LATE6=1;}
     #endif
 #else     
     sampled++;

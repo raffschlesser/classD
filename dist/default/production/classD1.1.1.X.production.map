@@ -88,11 +88,11 @@ Default Scalar Model: Small
 
 section                    address   length (PC units)   length (bytes) (dec)
 -------                    -------   -----------------   --------------------
-.text                        0x200               0x1a4           0x276  (630)
-.text                        0x3a4               0x2de           0x44d  (1101)
-.dinit                       0x682                0x14            0x1e  (30)
+.text                        0x200               0x19e           0x26d  (621)
+.text                        0x39e               0x2de           0x44d  (1101)
+.dinit                       0x67c                0x14            0x1e  (30)
 
-                 Total "program" memory used (bytes):          0x6e1  (1761) <1%
+                 Total "program" memory used (bytes):          0x6d8  (1752) <1%
 
 
 "data" Memory  [Origin = 0x1000, Length = 0x6000]
@@ -136,42 +136,42 @@ External Symbols in Program Memory (by address):
                   0x000248                  __data_init
                   0x000248                  __data_init_extended
                   0x0002fa                  __ADCAN0Interrupt
-                  0x000336                  __ADCAN1Interrupt
-                  0x00036c                  __ADCAN23Interrupt
-                  0x00039e                  __DefaultInterrupt
-                  0x0003a4                  _D0ADCConfig
-                  0x000412                  _D1ADCConfig
-                  0x000478                  _ShADCConfig
-                  0x0004ea                  _Update
-                  0x0004f0                  _HalfBridgePWM
-                  0x00053c                  _FullBridgePWM
-                  0x0005b0                  _ClockShift
-                  0x000600                  _AuxiliaryPLL
-                  0x000620                  _CompConfig
-                  0x000662                  _main
+                  0x000330                  __ADCAN1Interrupt
+                  0x000366                  __ADCAN23Interrupt
+                  0x000398                  __DefaultInterrupt
+                  0x00039e                  _D0ADCConfig
+                  0x00040c                  _D1ADCConfig
+                  0x000472                  _ShADCConfig
+                  0x0004e4                  _Update
+                  0x0004ea                  _HalfBridgePWM
+                  0x000536                  _FullBridgePWM
+                  0x0005aa                  _ClockShift
+                  0x0005fa                  _AuxiliaryPLL
+                  0x00061a                  _CompConfig
+                  0x00065c                  _main
                   0x02bf00                  __FSEC.sec
 
 External Symbols in Program Memory (by name):
 
-                  0x000600                  _AuxiliaryPLL
-                  0x0005b0                  _ClockShift
-                  0x000620                  _CompConfig
-                  0x0003a4                  _D0ADCConfig
-                  0x000412                  _D1ADCConfig
-                  0x00053c                  _FullBridgePWM
-                  0x0004f0                  _HalfBridgePWM
-                  0x000478                  _ShADCConfig
-                  0x0004ea                  _Update
+                  0x0005fa                  _AuxiliaryPLL
+                  0x0005aa                  _ClockShift
+                  0x00061a                  _CompConfig
+                  0x00039e                  _D0ADCConfig
+                  0x00040c                  _D1ADCConfig
+                  0x000536                  _FullBridgePWM
+                  0x0004ea                  _HalfBridgePWM
+                  0x000472                  _ShADCConfig
+                  0x0004e4                  _Update
                   0x0002fa                  __ADCAN0Interrupt
-                  0x000336                  __ADCAN1Interrupt
-                  0x00036c                  __ADCAN23Interrupt
-                  0x00039e                  __DefaultInterrupt
+                  0x000330                  __ADCAN1Interrupt
+                  0x000366                  __ADCAN23Interrupt
+                  0x000398                  __DefaultInterrupt
                   0x02bf00                  __FSEC.sec
                   0x000248                  __data_init
                   0x000248                  __data_init_extended
                   0x00023c                  __psv_init
                   0x000200                  __resetPRI
-                  0x000662                  _main
+                  0x00065c                  _main
 
 Memory Configuration
 
@@ -241,7 +241,7 @@ LOAD c:/program files (x86)/microchip/xc16/v1.40/bin/bin/../../lib\libfx-elf.a
                   0x000002          0x2 SHORT 0x0 ((ABSOLUTE (__reset) >> 0x10) & 0x7f)
                   0x000003          0x2 SHORT 0x0
 
-.text             0x000200        0x1a4
+.text             0x000200        0x19e
  *(.init)
  .init            0x000200         0x48 c:/program files (x86)/microchip/xc16/v1.40/bin/bin/../../lib\liblega-pic30-elf.a(crt0_extendedch.o)
                   0x000200                  __resetPRI
@@ -253,20 +253,20 @@ LOAD c:/program files (x86)/microchip/xc16/v1.40/bin/bin/../../lib\libfx-elf.a
  *(.user_init)
  *(.handle)
  *(.isr*)
- .isr.text        0x0002fa         0xa4 build/default/production/adc.o
+ .isr.text        0x0002fa         0x9e build/default/production/adc.o
                   0x0002fa                  __ADCAN0Interrupt
-                  0x000336                  __ADCAN1Interrupt
-                  0x00036c                  __ADCAN23Interrupt
- .isr             0x00039e          0x4 default_isr
-                  0x00039e                  __DefaultInterrupt
+                  0x000330                  __ADCAN1Interrupt
+                  0x000366                  __ADCAN23Interrupt
+ .isr             0x000398          0x4 default_isr
+                  0x000398                  __DefaultInterrupt
  *(.libc)
  *(.libm)
  *(.libdsp)
  *(.lib*)
  .libpic30_crt_start_mode
-                  0x0003a2          0x2 c:/program files (x86)/microchip/xc16/v1.40/bin/bin/../../lib\liblega-pic30-elf.a(crt_start_mode_normalch.Leo)
-                  0x0003a2                  __crt_start_mode
-                  0x0003a2                  __crt_start_mode_normal
+                  0x00039c          0x2 c:/program files (x86)/microchip/xc16/v1.40/bin/bin/../../lib\liblega-pic30-elf.a(crt_start_mode_normalch.Leo)
+                  0x00039c                  __crt_start_mode
+                  0x00039c                  __crt_start_mode_normal
 
 usercode
  *(usercode)
@@ -344,13 +344,13 @@ __FBTSEQ
  .debug_abbrev    0x000257         0xc7 build/default/production/system.o
  .debug_abbrev    0x00031e         0xc3 build/default/production/comp.o
 
-.debug_line       0x000000        0x56e
+.debug_line       0x000000        0x56c
  *(.debug_line)
- .debug_line      0x000000        0x16c build/default/production/adc.o
- .debug_line      0x00016c         0xf9 build/default/production/main.o
- .debug_line      0x000265        0x116 build/default/production/pwm.o
- .debug_line      0x00037b         0xfb build/default/production/system.o
- .debug_line      0x000476         0xf8 build/default/production/comp.o
+ .debug_line      0x000000        0x16a build/default/production/adc.o
+ .debug_line      0x00016a         0xf9 build/default/production/main.o
+ .debug_line      0x000263        0x116 build/default/production/pwm.o
+ .debug_line      0x000379         0xfb build/default/production/system.o
+ .debug_line      0x000474         0xf8 build/default/production/comp.o
 
 .debug_frame      0x000000        0x1e8
  *(.debug_frame)
@@ -4071,22 +4071,22 @@ __c30_signature
 .config_BSLIM     0x02bf10          0x2
  .config_BSLIM    0x02bf10          0x2 build/default/production/system.o
 
-.text             0x0003a4        0x2de
- .text            0x0003a4        0x14c build/default/production/adc.o
-                  0x0003a4                  _D0ADCConfig
-                  0x000412                  _D1ADCConfig
-                  0x000478                  _ShADCConfig
-                  0x0004ea                  _Update
- .text            0x0004f0         0xc0 build/default/production/pwm.o
-                  0x0004f0                  _HalfBridgePWM
-                  0x00053c                  _FullBridgePWM
- .text            0x0005b0         0x70 build/default/production/system.o
-                  0x0005b0                  _ClockShift
-                  0x000600                  _AuxiliaryPLL
- .text            0x000620         0x42 build/default/production/comp.o
-                  0x000620                  _CompConfig
- .text            0x000662         0x20 build/default/production/main.o
-                  0x000662                  _main
+.text             0x00039e        0x2de
+ .text            0x00039e        0x14c build/default/production/adc.o
+                  0x00039e                  _D0ADCConfig
+                  0x00040c                  _D1ADCConfig
+                  0x000472                  _ShADCConfig
+                  0x0004e4                  _Update
+ .text            0x0004ea         0xc0 build/default/production/pwm.o
+                  0x0004ea                  _HalfBridgePWM
+                  0x000536                  _FullBridgePWM
+ .text            0x0005aa         0x70 build/default/production/system.o
+                  0x0005aa                  _ClockShift
+                  0x0005fa                  _AuxiliaryPLL
+ .text            0x00061a         0x42 build/default/production/comp.o
+                  0x00061a                  _CompConfig
+ .text            0x00065c         0x20 build/default/production/main.o
+                  0x00065c                  _main
 
-.dinit            0x000682         0x14
- .dinit           0x000682         0x14 data_init
+.dinit            0x00067c         0x14
+ .dinit           0x00067c         0x14 data_init
