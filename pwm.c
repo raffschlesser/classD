@@ -1,17 +1,29 @@
 /*
- * File:   ADC.c
+ * File:   pwm.c
  * Author: Raff
  *
- * Created on 22 september 2019, 13:37
+ * pwm.c is used to config the high resulution PWM modules
+ * period, dutycylce phase and deadtime can be configered at the top 
+ * and is at the start of theprogram set the same for every PWM module
+ * later duty cycle will be changed in the ADC interupts
  */
 
 
 #include "xc.h"
 
+#define PWMperiod 0x451D;
+#define PWMdeadtime 145;
+#define PWMphase 0x10;
+#define PWMduty 0x0010;
+
+
+
 void HalfBridgePWM(void){
+    //original writen to drive half bridge topology 
+    //but now used for sicing fron the full bridge pwm mudules
  
     //PWM control register configuration
-    PCLKCONbits.MCLKSEL = 1; // AFPLLO ? Auxiliary PLL post-divider output
+    PCLKCONbits.MCLKSEL = 1; // AFVCO/2 Auxiliary PLL post-divider output
     PCLKCONbits.DIVSEL = 0 ;
     PG1CONLbits.CLKSEL = 1; //PWM Generator uses Master clock selected by the MCLKSEL[1:0] (PCLKCON[1:0]) control bits
     PG1CONLbits.HREN = 1; // PWM Generator x operates in High-Resolution mode (resolution of 250ps)
@@ -27,19 +39,20 @@ void HalfBridgePWM(void){
     //PWM Generator controls the PWM1H and PWM1L output pins
     //PWM1H & PWM1L output pins are active high
     PG1EVTLbits.UPDTRG = 1; // A write of the PGxDC register automatically sets the UPDATE bit
-    PG1EVTLbits.ADTR1PS = 0; //0; //1:1 postscaler Trigger 1
+    PG1EVTLbits.ADTR1PS = 1; //1:1 postscaler Trigger 1
     PG1EVTLbits.ADTR1EN1 = 1; //PGxTRIGA for triggering trigger 1
     //Write to DATA REGISTERS
-    PG1PER = 0x435a;//0x21a0;// //PWM frequency is 100kHz
-    PG1DC = 0x0000; // ?% duty
-    PG1PHASE = 0x0010; //Phase offset in rising edge of PWM
-    PG1DTH = 145; //Dead time on PWMH   250ps * 400 = 100 ns
-    PG1DTL = 145; //Dead time on PWML   250ps * 400 = 100 ns
+    PG1PER = PWMperiod;//0x21a0;// //PWM frequency is 100kHz
+    PG1DC = PWMduty; // ?% duty
+    PG1PHASE = PWMphase; //Phase offset in rising edge of PWM
+    PG1DTH = PWMdeadtime; //Dead time on PWMH   250ps * 400 = 100 ns
+    PG1DTL = PWMdeadtime; //Dead time on PWML   250ps * 400 = 100 ns
     PG1TRIGA = 0x0010;
     //Enable PWM
     PG1CONLbits.ON = 1; //PWM module is enabled
-
 }
+
+
 void FullBridgePWM(void){
  
     //PWM control register configuration
@@ -59,11 +72,11 @@ void FullBridgePWM(void){
     //PWM Generator controls the PWM3H and not PWM3L output pins
     //PWM3H & PWM3L output pins are active high
     //Write to DATA REGISTERS
-    PG3PER = 0x435a; //0x21a0;////PWM frequency
-    PG3DC = 0x0010; // 0% duty
-    PG3PHASE = 0x0010; //Phase offset in rising edge of PWM
-    PG3DTH = 145; //Dead time on PWMH   250ps * 400 = 100 ns
-    PG3DTL = 145; //Dead time on PWML   250ps * 400 = 100 ns
+    PG3PER = PWMperiod;////PWM frequency
+    PG3DC = PWMduty; // 0% duty
+    PG3PHASE = PWMphase; //Phase offset in rising edge of PWM
+    PG3DTH = PWMdeadtime; //Dead time on PWMH   250ps * 400 = 100 ns
+    PG3DTL = PWMdeadtime; //Dead time on PWML   250ps * 400 = 100 ns
     PG3EVTLbits.UPDTRG = 1; // A write of the PGxDC register automatically sets the UPDATE bit
     
     PG4CONLbits.CLKSEL = 1; // PWM Generator uses Master clock selected by the MCLKSEL[1:0] (PCLKCON[1:0]) control bits)
@@ -83,11 +96,11 @@ void FullBridgePWM(void){
    // PG2EVTLbits.ADTR1EN1 = 1; //PGxTRIGA for triggering trigger 1
     //Write to DATA REGISTERS
     //PG2PER = 0x1fff; //PWM frequency
-    PG4PER = 0x435a;//0x21a0;// //PWM frequency
-    PG4DC = 0x0000; // 0% duty
-    PG4PHASE = 0x0010; //Phase offset in rising edge of PWM
-    PG4DTH = 145; //Dead time on PWMH   250ps * 400 = 100 ns
-    PG4DTL = 145; //Dead time on PWML   250ps * 400 = 100 ns
+    PG4PER = PWMperiod;//PWM frequency
+    PG4DC = PWMduty; // DC/PER = ...% duty
+    PG4PHASE = PWMphase; //Phase offset in rising edge of PWM
+    PG4DTH = PWMdeadtime; //Dead time on PWMH   250ps * DT = ... ns
+    PG4DTL = PWMdeadtime; //Dead time on PWML   250ps * DT = ... ns
     
     //Enable PWM
     PG3CONLbits.ON = 1; //PWM module is enabled

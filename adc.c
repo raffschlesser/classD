@@ -2,21 +2,35 @@
  * File:   ADC.c
  * Author: Raff
  *
- * Created on 22 september 2019, 13:37
+ * adc.c is responseble for the adc configs and interupts
+ * the adc interupt is used to change the pwm duty cycles
+ * DOADC is dedicated core 0 and is udes to sample the audio
+ * D1ADC is dedicated core 1 is implemented but not used yet.
+ * SHADC is shared core is implemented but not used yet.
+ * 
+ * diffrent PWM mode or an oversampling filter can be chosen down below
  */
 
-//#define FEEDBACK
+
+
+
+// decomment to enable
+//#define oversampling;
+
+
+//decomment to enable BD mode else AD mode
 #define PWMMODE
 
+
 #include "xc.h"
-static int16_t running[2]={2048,2048};
+
+//variables
 static int16_t dataADC0=0;
 static int16_t dataADC1=0;
-static int16_t data=0xfff;
-static int16_t sampled=0;
 int16_t gain=1;
 double integral=0;
 int16_t error=0;
+
 
 void D0ADCConfig(void){
     // dedicated core 0 ADC INITIALIZATION
@@ -29,8 +43,27 @@ void D0ADCConfig(void){
     // Configure the cores? ADC clock.
     ADCORE0Hbits.ADCS = 0; // dedicated core clock divider (1:2) (max is 70MHz)
     // Configure sample time for shared core.
+#ifndef oversampling
     ADCON4L = 3; //Dedicated ADC Core 0 and 1 Conversion Delay Enabled
-    ADCORE0Lbits.SAMC = 0; // 12 TAD sample time
+    ADCORE0Lbits.SAMC = 0; // 2 TAD sample time
+    // Configure and enable early ADC interrupts.
+    ADCORE0Hbits.EISEL = 0; // early interrupt is generated 1 TADCORE clock prior to when the data is ready
+    ADCON2Lbits.EIEN = 1; // enable early interrupts for ALL inputs
+    ADEIELbits.EIEN0 = 1; // enable early interrupt for AN0 
+    _ADCAN0IF = 0; // clear interrupt flag for AN23
+    _ADCAN0IE = 1; // enable interrupt for AN23
+#else
+    ADFL0CONbits.OVRSAM=0b101;  // oversampling x8 14bit result
+    // Configure sample time for shared core.
+    ADCON4L = 3; //Dedicated ADC Core 0 and 1 Conversion Delay Enabled
+    ADCORE0Lbits.SAMC = 30; // 2 TAD sample time
+    ADFL0CONbits.FLCHSEL=0; // AN0 for filter 0
+    ADFL0CONbits.MODE=0;    // oversam^pling filter
+    ADFL0CONbits.IE=1;      // filter will give interupt when data is ready
+    _ADFLTR0IF =0;          // clear interupt flag
+    _ADFLTR0IE =1;          // enable interupt 
+    ADFL0CONbits.FLEN=1;    // enalble filter
+#endif
     // Configure the ADC reference sources.
     ADCON3Lbits.REFSEL = 0; // AVdd and AVss as voltage reference
     //sellect resolution
@@ -41,14 +74,6 @@ void D0ADCConfig(void){
     //defuald is Channel is single-ended and Channel output data are unsigned
     ADMOD0Lbits.SIGN0 = 0; // AN0/RA0
     ADMOD0Lbits.DIFF0 = 0; // AN0/RA0
-
-
-    // Configure and enable early ADC interrupts.
-    ADCORE0Hbits.EISEL = 0; // early interrupt is generated 1 TADCORE clock prior to when the data is ready
-    ADCON2Lbits.EIEN = 1; // enable early interrupts for ALL inputs
-    ADEIELbits.EIEN0 = 1; // enable early interrupt for AN0 
-    _ADCAN0IF = 0; // clear interrupt flag for AN23
-    _ADCAN0IE = 1; // enable interrupt for AN23
 
     // Set initialization time to maximum
     ADCON5Hbits.WARMTIME = 15;
@@ -173,12 +198,8 @@ void ShADCConfig(void){
 // ADC AN0 ISR (CORE 0)
 void __attribute__((interrupt, no_auto_psv)) _ADCAN0Interrupt(void)
 {
-    dataADC0 = (ADCBUF0); // read conversion resul
-   
-    
-    #ifndef FEEDBACK
- 
-    #ifndef PWMMODE
+    dataADC0 = (ADCBUF0); // read conversion resul 
+#ifndef PWMMODE
     PG1DC = dataADC0; //1;
     if(dataADC0&0x800){
         PG4DC = 0;
@@ -189,14 +210,11 @@ void __attribute__((interrupt, no_auto_psv)) _ADCAN0Interrupt(void)
     }
     #else
     //dataADC0=(((dataADC0-2048)*2)+2048);
-    PG1DC = dataADC0<<2;
-    PG4DC = dataADC0<<2;
-    PG3DC = ((dataADC0^0xfff)-0)<<2;
+    PG1DC = (dataADC0+0x28f)<<2;
+    PG4DC = (dataADC0+0x28f)<<2;
+    PG3DC = ((dataADC0^0xfff)+0x28f)<<2;
     if(LATEbits.LATE6==1){LATEbits.LATE6=0;}else{LATEbits.LATE6=1;}
     #endif
-#else     
-    sampled++;
-#endif
     _ADCAN0IF = 0; // clear interrupt flag
 }
 
@@ -204,25 +222,6 @@ void __attribute__((interrupt, no_auto_psv)) _ADCAN0Interrupt(void)
 void __attribute__((interrupt, no_auto_psv)) _ADCAN1Interrupt(void)
 {
     dataADC1 = (ADCBUF1); // read conversion resul
-    #ifndef FEEDBACK
-    #ifndef PWMMODE
-    PG1DC = dataADC0; //1;
-    if(dataADC0&0x800){
-        PG4DC = 0;
-        PG3DC =(dataADC0&0x7ff); //2;
-    }else{
-        PG3DC = 0;
-        PG4DC = (dataADC0^0x7ff); //2;
-    }
-    #else
-    PG1DC = dataADC1<<2;
-    PG4DC = dataADC1<<2;
-    PG3DC = (dataADC1^0xfff)<<2;
-    if(LATEbits.LATE6==1){LATEbits.LATE6=0;}else{LATEbits.LATE6=1;}
-    #endif
-#else     
-    sampled++;
-#endif
     _ADCAN1IF = 0; // clear interrupt flag
 }
 
@@ -230,70 +229,20 @@ void __attribute__((interrupt, no_auto_psv)) _ADCAN1Interrupt(void)
 void __attribute__((interrupt, no_auto_psv)) _ADCAN23Interrupt(void)
 {
     dataADC0 = ADCBUF23; // read conversion result
-    //dataADC0 = 0x0fff;
-    PG1DC = dataADC0;
-    PG4DC = dataADC0;
-    PG3DC = (dataADC0^0xfff)<<1;
     if(LATEbits.LATE6==1){LATEbits.LATE6=0;}else{LATEbits.LATE6=1;}
     _ADCAN23IF = 0; // clear interrupt flag
 }
 
+// ADC interupyt for oversampling filter
+void __attribute__((interrupt, no_auto_psv)) _ADFLTR0Interrupt(void){
+    dataADC0 = ADFL0DAT; // read conversion resul
+    PG1DC = dataADC0;
+    PG4DC = dataADC0;
+    PG3DC = (dataADC0^0x3fff);
+    if(LATEbits.LATE6==1){LATEbits.LATE6=0;}else{LATEbits.LATE6=1;}
+    _ADFLTR0IF =0;
+}
+
 void Update(){
-    #ifndef FEEDBACK
-    /*#ifndef PWMMODE
-    if (sampled ==1){
-    PG1DC = dataADC0<<1; //1;
-    if(dataADC0&0x800){
-        PG4DC = 0;
-        PG3DC =(dataADC0&0x7ff)<<2; //2;
-    }else{
-        PG3DC = 0;
-        PG4DC = (dataADC0^0x7ff)<<2; //2;
-    }
-    LATEbits.LATE6=1;
-    }else if (sampled>1) LATEbits.LATE5=1;
-    #else
-    PG1DC = dataADC0<<1; //1;
-    PG4DC = dataADC0<<1;
-    PG3DC = (dataADC0^0xfff)<<1;
-    #endif*/
-    #else
-    if(sampled==2){
-        sampled=0;
-        
-      
-        dataADC1=(dataADC1^0xfff);
-        error = error+ (dataADC1-dataADC0)>>2;
-       // if(error!=0)LATEbits.LATE6=1;
-        //integral = integral+(((double)error));
-        if(integral>1000){
-            integral=1000;
-        }
-        if(integral<-1000){
-            integral=-1000;
-        }
-        
-        if(LATEbits.LATE5==1){LATEbits.LATE5=0;}else{LATEbits.LATE5=1;}
-        dataADC0 = dataADC0+error;//+(integral*0.001);*/
-        
-         
-    #ifndef PWMMODE
-    if (sampled ==1){
-    PG1DC = dataADC0<<1; //1;
-    if(dataADC0&0x800){
-        PG4DC = 0;
-        PG3DC =(dataADC0&0x7ff)<<2; //2;
-    }else{
-        PG3DC = 0;
-        PG4DC = (dataADC0^0x7ff)<<2; //2;
-    }
-    LATEbits.LATE6=1;
-    }else if (sampled>1) LATEbits.LATE5=1;
-    #else
-    PG1DC = dataADC0<<1; //1;
-    PG4DC = dataADC0<<1;
-    PG3DC = (dataADC0^0xfff)<<1;
-    #endif
-    }else if(sampled>2)LATEbits.LATE6=1; //error has happened
-    #endif
+
 }

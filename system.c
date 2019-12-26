@@ -75,8 +75,7 @@
 #pragma config BTMODE = SINGLE    //Device Boot Mode Configuration->Device is in Single Boot (legacy) mode
 
 void ClockShift (void){
-    
-     // Configure PLL prescaler, both PLL postscalers, and PLL feedback divider
+    // Configure PLL prescaler, both PLL postscalers, and PLL feedback divider
     /*POSC = 8MHz   Fvco = 1000MHz    Fpllo = 83MHz   FOSC = 41MHz*/
     CLKDIVbits.PLLPRE = 1; // 8MHz -> 8MHz
     PLLFBDbits.PLLFBDIV =125; // 8MHz -> 1000MHz
@@ -94,9 +93,9 @@ void ClockShift (void){
 }
 
 void AuxiliaryPLL(){
-    /*POSC = 8MHz   AFvco = 1600MHz     AFpllo = 1600MHz */
+    /*POSC = 8MHz   AFvco = 1000MHz     AFpllo = 1000MHz */
     ACLKCON1bits.APLLPRE = 1;
-    APLLFBD1bits.APLLFBDIV = 200; // 8MHz -> 1600MHz
+    APLLFBD1bits.APLLFBDIV = 125; // 8MHz -> 1000MHz
     APLLDIV1bits.APOST1DIV = 1;
     APLLDIV1bits.APOST2DIV = 1;
     ACLKCON1bits.APLLEN = 1;
